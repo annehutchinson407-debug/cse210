@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 
 class Journal
 {
@@ -27,22 +28,33 @@ class Journal
 
     public void SaveToFile(string filename)
     {
-        List<string> lines = new List<string>();
-        foreach (Entry entry in _entries)
+        string json = JsonSerializer.Serialize(_entries, new JsonSerializerOptions
         {
-            lines.Add(entry.ToFileLine());
-        }
-
-        File.WriteAllLines(filename, lines);
+            WriteIndented = true
+        });
+        File.WriteAllText(filename, json);
     }
 
     public void LoadFromFile(string filename)
     {
-        string[] lines = File.ReadAllLines(filename);
         List<Entry> loadedEntries = new List<Entry>();
-        foreach (string line in lines)
+        string contents = File.ReadAllText(filename);
+        string trimmedContents = contents.TrimStart();
+
+        if (trimmedContents.StartsWith("[", StringComparison.Ordinal))
         {
-            loadedEntries.Add(Entry.FromFileLine(line));
+            loadedEntries = JsonSerializer.Deserialize<List<Entry>>(contents);
+            if (loadedEntries == null)
+            {
+                throw new FormatException("The journal file does not contain a journal entry list.");
+            }
+        }
+        else
+        {
+            foreach (string line in File.ReadAllLines(filename))
+            {
+                loadedEntries.Add(Entry.FromFileLine(line));
+            }
         }
 
         _entries.Clear();

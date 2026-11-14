@@ -1,4 +1,7 @@
+// Added more prompts for the user and implemented a way to save or load the journal document to JSON
+
 using System;
+using System.Text.Json;
 
 class Program
 {
@@ -130,7 +133,8 @@ class Program
             exception is UnauthorizedAccessException ||
             exception is ArgumentException ||
             exception is NotSupportedException ||
-            exception is FormatException)
+            exception is FormatException ||
+            exception is JsonException)
         {
             Console.WriteLine("Could not load the journal: " + exception.Message);
         }
