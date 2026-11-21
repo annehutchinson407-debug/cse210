@@ -1,18 +1,22 @@
 using System;
-using System.Linq;
 
 class Word
 {
-    private readonly string _text;
-    private bool _isHidden;
+    private string _text;
+    private bool _isHidden = false;
 
     public Word(string text)
     {
         _text = text;
-        _isHidden = false;
     }
 
-    public bool IsHidden => _isHidden;
+    public bool IsHidden
+    {
+        get
+        {
+            return _isHidden;
+        }
+    }
 
     public void Hide()
     {
@@ -21,12 +25,25 @@ class Word
 
     public override string ToString()
     {
-        if (!_isHidden)
+        if (_isHidden == false)
         {
             return _text;
         }
 
-        return string.Concat(_text.Select(character =>
-            char.IsLetter(character) ? '_' : character));
+        string hiddenWord = "";
+
+        for (int i = 0; i < _text.Length; i++)
+        {
+            if (char.IsLetter(_text[i]))
+            {
+                hiddenWord += "_";
+            }
+            else
+            {
+                hiddenWord += _text[i];
+            }
+        }
+
+        return hiddenWord;
     }
 }
